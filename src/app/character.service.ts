@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Hero } from './hero';
-import { HEROES } from './mock-heroes';
+import { Character } from './Character';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { MessageService } from './message.service';
@@ -8,35 +7,36 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
 
 @Injectable()
-export class HeroService {
+export class CharacterService {
 
-  private heroesUrl = 'api/heroes';  // URL to web api
+  private charactersUrl = 'https://swapi.co/api/people/';  // URL to web api
 
   constructor(
     private http: HttpClient,
     private messageService: MessageService) { }
 
-  /** GET heroes from the server */
-  getHeroes (): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.heroesUrl)
+  /** GET Character from the SWAPI */
+  getCharacters () : Observable<Character[]>{
+    return this.http.get<Character[]>(this.charactersUrl)
       .pipe(
-        tap(heroes => this.log(`fetched heroes`)),
-        catchError(this.handleError('getHeroes', []))
+        map((res: Response) => <Character[]>res.results),
+        tap(characters => this.log(`fetched characters`)),
+        catchError(this.handleError('getCharacters', []))
       );
   }
 
-  /** GET hero by id. Will 404 if id not found */
-  getHero(id: number): Observable<Hero> {
-    const url = `${this.heroesUrl}/${id}`;
-    return this.http.get<Hero>(url).pipe(
-      tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Hero>(`getHero id=${id}`))
-    );
-  }
+  /** GET Character by id. Will 404 if id not found */
+  // getHero(id: number): Observable<Character> {
+  //   const url = `${this.heroesUrl}/${id}`;
+  //   return this.http.get<Character>(url).pipe(
+  //     tap(_ => this.log(`fetched Character id=${id}`)),
+  //     catchError(this.handleError<Character>(`getHero id=${id}`))
+  //   );
+  // }
 
   /** Log a HeroService message with the MessageService */
   private log(message: string) {
-    this.messageService.add('HeroService: ' + message);
+    this.messageService.add('CharacterService: ' + message);
   }
 
     /**
